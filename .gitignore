@@ -1,0 +1,16 @@
+# Binaries
+/strok
+*.exe
+
+# Test artifacts
+*.out
+*.corrupt
+
+# Local screenshots / scratch
+/strok.png
+/*.png
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
