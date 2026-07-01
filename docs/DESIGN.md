@@ -202,6 +202,45 @@ Update. Multiplayer → transport pkg + remote msgs. Heatmaps/analytics → read
 pkg over Profile.KeyStats. Plugins → LessonGenerator registry. Streaks → Profile
 fields + Apply. Four interfaces + pure domain + versioned profile make all additive.
 
+### 9. Persistence: why JSON, when SQLite
+
+**Decision: JSON now, SQLite only if/when a feature needs relational history.**
+
+Why JSON is sufficient today:
+- The whole profile is one small document — a few aggregate numbers plus a
+  `map[key]→{presses,errors}` of ≤ ~50 entries. A few KB even after years of use.
+- Single local user, one process: one writer, one reader, writes only at
+  lesson-end/quit (not a hot path). This is the case where a file beats a DB.
+- We load the entire profile into memory anyway, so there is nothing to query.
+- Crash safety is already handled: atomic temp-file + rename on Save, and a
+  corrupt file is backed up and recovered rather than crashing (jsonstore.go).
+
+What SQLite would buy, and whether we need it:
+- Concurrency, large-dataset querying, partial updates → not needed at this size.
+- The one real future case is **per-session history / time-series** (WPM over
+  time, daily streaks with per-day rows, heatmaps over time). That is genuinely
+  relational and is where SQL would earn its keep. We currently store aggregates
+  only, which JSON handles fine.
+
+Cost of adopting SQLite prematurely:
+- `mattn/go-sqlite3` needs CGO, which breaks the pure-Go, dependency-free,
+  single-binary, easy-cross-compile property (a stated selling point).
+- `modernc.org/sqlite` is pure Go but a heavy dependency — a lot of machinery
+  for a few KB of data with no user-visible benefit.
+
+Migration path (kept cheap by design):
+- All persistence sits behind the `storage.Store` interface; the rest of the app
+  depends on the interface, not on JSON. Swapping to SQLite = one new
+  `SQLiteStore` implementing `Load`/`Save`, plus one line changed in
+  `cmd/strok/main.go`. Nothing else moves.
+- When history is wanted, the intermediate step is an **append-only
+  `sessions.jsonl`** (one JSON line per completed lesson) alongside the aggregate
+  profile — cheap, schema-less, and a natural import source if it later grows
+  enough to justify SQLite.
+
+Trigger to revisit: building trend charts, per-day streaks, or analytics over a
+large session history. Until then, JSON stays.
+
 ---
 
 ## Phase 3 — Implementation roadmap
