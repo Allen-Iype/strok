@@ -52,7 +52,7 @@ func New(l domain.Lesson) *TypingState {
 }
 
 // HandleKey processes a typed rune. It records correctness at the cursor,
-// advances on a correct key, and (Keybr-style) permanently counts any wrong key
+// advances on a correct key, and permanently counts any wrong key
 // as an error even though the user may later backspace and retype.
 func (s *TypingState) HandleKey(r rune) {
 	if s.Done() {

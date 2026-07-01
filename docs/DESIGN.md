@@ -1,6 +1,6 @@
 # strok — Design Document
 
-A terminal-based typing tutor inspired by Keybr, built for developers.
+A terminal-based typing app, built for developers.
 Terminal-first, lightweight, responsive. Single Go binary. Linux / macOS / Windows.
 
 > This is the written design produced in Phases 1–4. Implementation (Phase 5)
@@ -12,7 +12,7 @@ Terminal-first, lightweight, responsive. Single Go binary. Linux / macOS / Windo
 ## Phase 1 — Product Understanding
 
 ### Primary goal
-A terminal-first typing tutor that **always shows a full color-coded keyboard
+A terminal-first typing app that **always shows a full color-coded keyboard
 with finger mapping**, gives **live per-character feedback**, computes
 **WPM / accuracy / errors live**, generates **progressive lessons**, and
 **persists progress as JSON**. Feels like a polished open-source project.
@@ -28,7 +28,7 @@ with finger mapping**, gives **live per-character feedback**, computes
 - JSON persistence: best WPM, avg WPM, accuracy, practice time, completed lessons, weak keys.
 
 ### Explicitly later (design for, do NOT build)
-Adaptive Keybr algorithm, heatmaps, streaks, themes, multiple layouts,
+Adaptive data-driven lesson algorithm, heatmaps, streaks, themes, multiple layouts,
 programming-symbols mode, vim mode, multiplayer, sound, plugin generators.
 
 ### Edge cases
@@ -40,7 +40,7 @@ Unicode/wide chars (MVP: ASCII only).
 ### Assumptions / decisions
 1. Layout: US ANSI QWERTY, standard touch-typing finger map.
 2. Practice text is ASCII lowercase letters + spaces in MVP.
-3. **Backspace allowed, errors permanent (Keybr-style):** backspace fixes visible
+3. **Backspace allowed, errors permanent:** backspace fixes visible
    text only; any wrong keystroke permanently counts against accuracy/errors.
 4. WPM = (correct chars / 5) / minutes. Timer starts on first keystroke.
 5. A lesson is one fixed-length practice string (~30–60 chars). Completing it

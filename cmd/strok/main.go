@@ -1,4 +1,4 @@
-// Command strok is a terminal-based typing tutor inspired by Keybr.
+// Command strok is a terminal-based typing app.
 //
 // Run it with:
 //

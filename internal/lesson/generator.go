@@ -1,5 +1,5 @@
 // Package lesson generates practice text. The Generator interface is the seam
-// where a future adaptive (Keybr-style) algorithm can be swapped in without
+// where a future adaptive, data-driven algorithm can be swapped in without
 // touching the rest of the application.
 package lesson
 

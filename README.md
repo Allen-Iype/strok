@@ -1,6 +1,6 @@
 # strok
 
-A terminal-based typing tutor for developers, inspired by [Keybr](https://www.keybr.com/).
+A terminal-based typing app for developers.
 
 `strok` always shows a full, finger-colored keyboard, gives live per-character
 feedback, and grows the alphabet you practice as you improve — all in a single,
@@ -11,10 +11,13 @@ dependency-free binary.
 
 WPM 42   ACC 97%   ERR 3   CHARS 58   TIME 00:21
 
-  fjfj jfjf ffjj djkd fjf
+  fjfj jfjf ffjj djkd fjf      (each letter tinted by its finger)
 
   ┌─┬─┬─┬ … full color-coded keyboard, current key highlighted … ┐
   └──────────────────────────────────────────────────────────────┘
+
+  ● L-pinky  ● L-ring  ● L-mid  ● L-index
+  ● R-index  ● R-mid  ● R-ring  ● R-pinky  ● thumb
 
 esc/ctrl+c quit · backspace correct · tab restart lesson
 ```
@@ -22,7 +25,11 @@ esc/ctrl+c quit · backspace correct · tab restart lesson
 ## Features
 
 - **Always-visible keyboard** with every key mapped to a finger and color-coded
-  by finger (9 colors).
+  by finger (9 colors), plus a **finger-color legend** beneath it so you can tell
+  which color means which finger.
+- **Finger-colored text**: upcoming characters are tinted by the finger that
+  types them, so you know which finger to use before you press. Already-typed
+  characters stay green (correct) or red (wrong).
 - **Live feedback**: the current key is highlighted; a correct press flashes
   green, a wrong press turns the expected key yellow and the pressed key red.
 - **Live stats**: WPM, accuracy, errors, characters typed, elapsed time.
@@ -62,8 +69,8 @@ go build -o strok ./cmd/strok
 | `tab` | restart the current lesson |
 | `esc` / `ctrl+c` | save and quit |
 
-Backspace lets you fix the text you see, but — like Keybr — every wrong keystroke
-permanently counts against your accuracy.
+Backspace lets you fix the text you see, but every wrong keystroke permanently
+counts against your accuracy.
 
 ## Architecture
 
