@@ -7,8 +7,9 @@ import (
 )
 
 // minHeight is the smallest terminal height the full layout needs. The bordered
-// keyboard occupies 15 lines; the rest is header, stats, text, footer and frame.
-const minHeight = 26
+// keyboard occupies 15 lines plus the finger legend ~3; the rest is header,
+// stats, text, footer and frame.
+const minHeight = 28
 
 // View composes the full frame each render. It recomputes layout from the
 // current dimensions so terminal resizes are handled gracefully.
@@ -36,9 +37,10 @@ func (m Model) View() string {
 	if m.width > 0 && m.width < textWidth {
 		textWidth = m.width
 	}
-	text := renderText(t, m.state.Entries(), m.state.Cursor(), textWidth)
+	text := renderText(t, m.deps.Layout, m.state.Entries(), m.state.Cursor(), textWidth)
 
 	kb := renderKeyboard(t, rows, m.state.Expected(), m.state.Feedback(), flashing)
+	legend := renderLegend(t, textWidth)
 	footer := renderFooter(t)
 
 	note := ""
@@ -55,6 +57,8 @@ func (m Model) View() string {
 		text+note,
 		"",
 		kb,
+		"",
+		legend,
 		"",
 		footer,
 	)

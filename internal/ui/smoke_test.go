@@ -45,6 +45,12 @@ func TestSmokeRenderAndType(t *testing.T) {
 	if !strings.Contains(out, "WPM") {
 		t.Fatal("stats bar not rendered")
 	}
+	if !strings.Contains(out, "L-index") {
+		t.Fatal("finger legend not rendered")
+	}
+	if !strings.Contains(out, "●") {
+		t.Fatal("legend swatch not rendered")
+	}
 
 	exp := m.state.Expected()
 	mm, _ = m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{exp}})
