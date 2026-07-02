@@ -9,6 +9,7 @@ import (
 	"strok/internal/engine"
 	"strok/internal/keyboard"
 	"strok/internal/lesson"
+	"strok/internal/mode"
 	"strok/internal/stats"
 	"strok/internal/storage"
 
@@ -36,6 +37,7 @@ type Deps struct {
 	Store     storage.Store
 	Clock     Clock
 	Theme     Theme
+	Mode      mode.Mode
 }
 
 // Model is the root Bubble Tea model.
@@ -50,7 +52,8 @@ type Model struct {
 	startedAt time.Time // first keystroke time of the current lesson
 	flashTill time.Time // when the current key flash expires
 
-	justFinished bool // shows a brief "lesson complete" note
+	justFinished bool         // shows the completion note this frame
+	outcome      mode.Outcome // result of the last completed lesson
 	quitting     bool
 }
 

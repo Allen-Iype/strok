@@ -32,6 +32,19 @@ func NewProfile() Profile {
 	return Profile{Version: ProfileVersion, KeyStats: map[string]KeyStat{}}
 }
 
+// Thresholds a completed lesson must clear to unlock the next letter.
+const (
+	AdvanceWPM      = 20.0
+	AdvanceAccuracy = 0.90
+)
+
+// Advanced reports whether a completed session clears the bar to unlock more
+// content. It is a pure predicate so progression rules stay testable and
+// mode-agnostic.
+func Advanced(s Session) bool {
+	return s.WPM >= AdvanceWPM && s.Accuracy >= AdvanceAccuracy
+}
+
 // Apply folds a completed session into the profile's running aggregates.
 func (p *Profile) Apply(s Session) {
 	if p.KeyStats == nil {

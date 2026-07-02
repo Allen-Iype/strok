@@ -73,7 +73,7 @@ func (m *Model) completeLesson() {
 	session := m.state.Session(snap, m.elapsed())
 
 	m.profile.Apply(session)
-	m.profile.UnlockedLevel++ // simple progression: each lesson unlocks more
+	m.outcome = m.deps.Mode.OnComplete(&m.profile, session)
 	_ = m.deps.Store.Save(m.profile)
 
 	next := m.deps.Generator.Next(m.profile)

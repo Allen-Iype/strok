@@ -14,6 +14,7 @@ import (
 
 	"strok/internal/keyboard"
 	"strok/internal/lesson"
+	"strok/internal/mode"
 	"strok/internal/storage"
 	"strok/internal/ui"
 
@@ -52,6 +53,7 @@ func run() error {
 		Store:     store,
 		Clock:     ui.RealClock{},
 		Theme:     ui.DefaultTheme(),
+		Mode:      mode.NewProgressive(),
 	}
 
 	model := ui.New(deps, profile)

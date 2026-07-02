@@ -45,7 +45,11 @@ func (m Model) View() string {
 
 	note := ""
 	if m.justFinished {
-		note = t.correct.Render("  ✓ lesson complete — next one ready")
+		style := t.pending
+		if m.outcome.Advanced {
+			style = t.correct
+		}
+		note = "  " + style.Render(m.outcome.Message)
 	}
 
 	body := lipgloss.JoinVertical(
