@@ -33,8 +33,9 @@ func renderStats(t Theme, s domain.Stats) string {
 // renderStatus draws the one-line status area under the lesson text, centered
 // to the same width. It always occupies exactly one line — blank when there is
 // nothing to report — so a message appearing or clearing never resizes the
-// frame.
-func renderStatus(t Theme, show bool, o mode.Outcome, width int) string {
+// frame. After a lesson it leads with the measured result so the learner sees
+// what they scored against the advance gate.
+func renderStatus(t Theme, show bool, o mode.Outcome, result domain.Stats, width int) string {
 	line := lipgloss.NewStyle().Width(width).Align(lipgloss.Center)
 	if !show {
 		return line.Render("")
@@ -43,7 +44,8 @@ func renderStatus(t Theme, show bool, o mode.Outcome, width int) string {
 	if o.Advanced {
 		style = t.correct
 	}
-	return line.Render(style.Render(o.Message))
+	res := t.stat.Render(fmt.Sprintf("%.0f wpm · %.0f%%", result.WPM, result.Accuracy*100))
+	return line.Render(res + "  " + style.Render(o.Message))
 }
 
 // renderFooter draws the key hints.

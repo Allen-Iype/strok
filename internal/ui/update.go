@@ -76,11 +76,37 @@ func (m *Model) completeLesson() {
 	m.outcome = m.deps.Mode.OnComplete(&m.profile, session)
 	_ = m.deps.Store.Save(m.profile)
 
+	prevKeys := m.state.Keyset()
 	next := m.deps.Generator.Next(m.profile)
+	if m.outcome.Advanced {
+		if r, ok := newlyUnlocked(prevKeys, next.Keyset); ok {
+			m.outcome.Message += ": " + string(r)
+		}
+	}
 	m.state = engine.New(next)
+	m.lastResult = snap
 	m.startedAt = time.Time{}
 	m.flashTill = time.Time{}
 	m.justFinished = true
+}
+
+// newlyUnlocked returns the key present in next but not in prev, provided there
+// is exactly one — the letter the learner just unlocked. It diffs the keysets
+// rather than assuming any ordering from the generator.
+func newlyUnlocked(prev, next []rune) (rune, bool) {
+	seen := make(map[rune]bool, len(prev))
+	for _, r := range prev {
+		seen[r] = true
+	}
+	var got rune
+	n := 0
+	for _, r := range next {
+		if !seen[r] {
+			got = r
+			n++
+		}
+	}
+	return got, n == 1
 }
 
 func (m Model) restartLesson() Model {

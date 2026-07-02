@@ -54,6 +54,7 @@ type Model struct {
 
 	justFinished bool         // shows the completion note this frame
 	outcome      mode.Outcome // result of the last completed lesson
+	lastResult   domain.Stats // final stats of the last completed lesson
 	quitting     bool
 }
 

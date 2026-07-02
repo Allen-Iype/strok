@@ -42,7 +42,7 @@ func (m Model) View() string {
 	kb := renderKeyboard(t, rows, m.state.Expected(), m.state.Feedback(), flashing)
 	legend := renderLegend(t, textWidth)
 	footer := renderFooter(t)
-	status := renderStatus(t, m.justFinished, m.outcome, textWidth)
+	status := renderStatus(t, m.justFinished, m.outcome, m.lastResult, textWidth)
 
 	body := lipgloss.JoinVertical(
 		lipgloss.Left,

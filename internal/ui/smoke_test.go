@@ -144,8 +144,12 @@ func TestGatedProgressionHoldsOnSlowLesson(t *testing.T) {
 	if m.outcome.Advanced {
 		t.Error("outcome should not report Advanced for a failing lesson")
 	}
-	if !strings.Contains(m.View(), "keep going") {
+	view := m.View()
+	if !strings.Contains(view, "keep going") {
 		t.Error("expected the keep-going note after a failing lesson")
+	}
+	if !strings.Contains(view, "0 wpm · 100%") {
+		t.Error("status line should show the finished lesson's result")
 	}
 }
 
@@ -174,5 +178,8 @@ func TestGatedProgressionAdvancesOnGoodLesson(t *testing.T) {
 	}
 	if !m.outcome.Advanced {
 		t.Error("outcome should report Advanced for a passing lesson")
+	}
+	if !strings.Contains(m.outcome.Message, "unlocked: d") {
+		t.Errorf("unlock message should name the new key 'd'; got %q", m.outcome.Message)
 	}
 }
