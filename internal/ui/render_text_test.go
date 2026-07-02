@@ -32,3 +32,30 @@ func TestRenderTextFingerColors(t *testing.T) {
 		t.Errorf("upcoming 'j' should be finger-colored R-index (209); got %q", out)
 	}
 }
+
+// TestRenderTextShowsError verifies a wrong keystroke is visible at the cursor:
+// the wrongly typed rune renders in the error color instead of the expected
+// character, until it is corrected.
+func TestRenderTextShowsError(t *testing.T) {
+	lipgloss.SetColorProfile(termenv.ANSI256)
+	th := DefaultTheme()
+	layout := keyboard.NewQWERTY()
+
+	st := engine.New(domain.Lesson{Text: "fj"})
+	st.HandleKey('x') // wrong: expected 'f'
+
+	out := renderText(th, layout, st.Entries(), st.Cursor(), 0)
+
+	if !strings.Contains(out, "x") {
+		t.Errorf("mistyped 'x' should be shown at the cursor; got %q", out)
+	}
+	if !strings.Contains(out, "38;5;203") {
+		t.Errorf("mistyped char should use the error color (203); got %q", out)
+	}
+
+	st.HandleKey('f') // correct it
+	out = renderText(th, layout, st.Entries(), st.Cursor(), 0)
+	if strings.Contains(out, "x") {
+		t.Errorf("corrected position should no longer show 'x'; got %q", out)
+	}
+}
