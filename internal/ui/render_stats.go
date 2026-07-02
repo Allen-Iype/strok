@@ -18,14 +18,31 @@ func renderHeader(t Theme, layoutName string, keyset []rune) string {
 	return lipgloss.JoinHorizontal(lipgloss.Bottom, title, " ", sub)
 }
 
-// renderStats draws the live statistics bar.
+// renderStats draws the live statistics bar. Every value sits in a fixed-width
+// slot so changing digit counts never shift the bar mid-lesson, and the WPM and
+// ACC values turn green once they clear the advance thresholds, showing at a
+// glance whether the lesson is on pace to unlock the next key.
 func renderStats(t Theme, s domain.Stats) string {
+	wpm := s.WPM
+	if wpm > 999 {
+		wpm = 999 // clamp the first-keystroke spike so its slot never overflows
+	}
+
+	passing := t.correct.Bold(true)
+	wpmStyle, accStyle := t.stat, t.stat
+	if s.WPM >= domain.AdvanceWPM {
+		wpmStyle = passing
+	}
+	if s.Accuracy >= domain.AdvanceAccuracy {
+		accStyle = passing
+	}
+
 	parts := []string{
-		statCell(t, "WPM", fmt.Sprintf("%.0f", s.WPM)),
-		statCell(t, "ACC", fmt.Sprintf("%.0f%%", s.Accuracy*100)),
-		statCell(t, "ERR", fmt.Sprintf("%d", s.Errors)),
-		statCell(t, "CHARS", fmt.Sprintf("%d", s.Typed)),
-		statCell(t, "TIME", formatDuration(s.Elapsed)),
+		statCell(t, "WPM", fmt.Sprintf("%.0f", wpm), 3, wpmStyle),
+		statCell(t, "ACC", fmt.Sprintf("%.0f%%", s.Accuracy*100), 4, accStyle),
+		statCell(t, "ERR", fmt.Sprintf("%d", s.Errors), 3, t.stat),
+		statCell(t, "CHARS", fmt.Sprintf("%d", s.Typed), 3, t.stat),
+		statCell(t, "TIME", formatDuration(s.Elapsed), 5, t.stat),
 	}
 	return strings.Join(parts, "   ")
 }
@@ -53,8 +70,10 @@ func renderFooter(t Theme) string {
 	return t.footer.Render("esc/ctrl+c quit · backspace correct · tab restart lesson")
 }
 
-func statCell(t Theme, label, value string) string {
-	return t.statLabel.Render(label+" ") + t.stat.Render(value)
+// statCell renders one label + value pair, the value left-aligned in a
+// fixed-width slot so the bar's geometry is independent of the value.
+func statCell(t Theme, label, value string, width int, style lipgloss.Style) string {
+	return t.statLabel.Render(label+" ") + style.Render(fmt.Sprintf("%-*s", width, value))
 }
 
 func spaced(rs []rune) string {
