@@ -51,6 +51,18 @@ func TestBackspaceClearsButKeepsError(t *testing.T) {
 	}
 }
 
+func TestBackspaceClearsFeedback(t *testing.T) {
+	s := New(lesson("fj"))
+	s.HandleKey('x') // wrong, feedback set
+	if s.Feedback().Pressed == 0 {
+		t.Fatal("feedback should be set after a keystroke")
+	}
+	s.Backspace()
+	if s.Feedback().Pressed != 0 {
+		t.Error("feedback should clear on backspace (error acknowledged)")
+	}
+}
+
 func TestKeyTallies(t *testing.T) {
 	s := New(lesson("ff"))
 	s.HandleKey('d') // wrong on first f

@@ -84,7 +84,10 @@ func (s *TypingState) HandleKey(r rune) {
 
 // Backspace moves the cursor back one position and clears the visible character
 // there. It does not erase the permanent error record (errors stay counted).
+// It clears the last-keystroke feedback: erasing a mistake acknowledges it, so
+// the UI should stop showing the error highlight.
 func (s *TypingState) Backspace() {
+	s.feedback = Feedback{}
 	if s.cursor == 0 {
 		// Clear an in-place incorrect mark at the very first position.
 		if s.entries[0].Status == Incorrect {

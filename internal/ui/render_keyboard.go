@@ -80,8 +80,12 @@ func renderKey(t Theme, k domain.Key, expected rune, fb engine.Feedback, flashin
 	return cap
 }
 
+// highlightFor picks a key's highlight. Correct feedback is a brief flash
+// (gated on flashing); incorrect feedback persists until the next keystroke or
+// backspace clears it, so the user has time to see which key they hit and
+// which was expected.
 func highlightFor(k domain.Key, expected rune, fb engine.Feedback, flashing bool) keyHighlight {
-	if k.IsChar() && flashing && fb.Pressed != 0 {
+	if k.IsChar() && fb.Pressed != 0 {
 		if !fb.Correct {
 			if k.Rune == fb.Expected {
 				return hlExpectErr
@@ -89,7 +93,7 @@ func highlightFor(k domain.Key, expected rune, fb engine.Feedback, flashing bool
 			if k.Rune == fb.Pressed {
 				return hlWrongPress
 			}
-		} else if k.Rune == fb.Expected {
+		} else if flashing && k.Rune == fb.Expected {
 			return hlCorrect
 		}
 	}
