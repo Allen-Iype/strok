@@ -12,6 +12,7 @@ import (
 	"strok/internal/mode"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type memStore struct{ p domain.Profile }
@@ -99,6 +100,30 @@ func TestSmokeTooSmall(t *testing.T) {
 	m = mm.(Model)
 	if !strings.Contains(m.View(), "too small") {
 		t.Fatal("expected too-small guard")
+	}
+}
+
+// TestCompletionKeepsFrameSize guards against the completion status message
+// resizing the frame: it used to be appended after the width-padded lesson
+// line, widening the whole box by ~40 columns for one frame.
+func TestCompletionKeepsFrameSize(t *testing.T) {
+	m := newTestModel()
+	mm, _ := m.Update(tea.WindowSizeMsg{Width: 110, Height: 40})
+	m = mm.(Model)
+
+	before := m.View()
+	m = typeLesson(m)
+	if !m.justFinished {
+		t.Fatal("lesson should be freshly completed")
+	}
+	after := m.View()
+
+	if w, h := lipgloss.Width(after), lipgloss.Height(after); w != lipgloss.Width(before) || h != lipgloss.Height(before) {
+		t.Errorf("frame size changed on completion: %dx%d -> %dx%d",
+			lipgloss.Width(before), lipgloss.Height(before), w, h)
+	}
+	if !strings.Contains(after, "keep going") {
+		t.Error("completion message should be visible on the status line")
 	}
 }
 

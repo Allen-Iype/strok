@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"strok/internal/domain"
+	"strok/internal/mode"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -27,6 +28,22 @@ func renderStats(t Theme, s domain.Stats) string {
 		statCell(t, "TIME", formatDuration(s.Elapsed)),
 	}
 	return strings.Join(parts, "   ")
+}
+
+// renderStatus draws the one-line status area under the lesson text, centered
+// to the same width. It always occupies exactly one line — blank when there is
+// nothing to report — so a message appearing or clearing never resizes the
+// frame.
+func renderStatus(t Theme, show bool, o mode.Outcome, width int) string {
+	line := lipgloss.NewStyle().Width(width).Align(lipgloss.Center)
+	if !show {
+		return line.Render("")
+	}
+	style := t.pending
+	if o.Advanced {
+		style = t.correct
+	}
+	return line.Render(style.Render(o.Message))
 }
 
 // renderFooter draws the key hints.
