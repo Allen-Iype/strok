@@ -15,7 +15,7 @@ import (
 // row and that the home keys are present.
 func TestKeyboardRendersAllRows(t *testing.T) {
 	q := keyboard.NewQWERTY()
-	out := renderKeyboard(DefaultTheme(), q.Rows(), 'f', engine.Feedback{}, false)
+	out := renderKeyboard(DefaultTheme(), q.Rows(), []rune{'f', 'j'}, 'f', engine.Feedback{}, false)
 
 	lines := strings.Split(out, "\n")
 	if len(lines) < 15 { // 5 rows × 3 lines each (top/mid/bottom border)
@@ -37,7 +37,7 @@ func TestErrorHighlightOutlivesFlash(t *testing.T) {
 	rows := keyboard.NewQWERTY().Rows()
 
 	// Flash expired (flashing=false) after a wrong press: error must persist.
-	out := renderKeyboard(th, rows, 'f', engine.Feedback{Expected: 'f', Pressed: 'x'}, false)
+	out := renderKeyboard(th, rows, []rune{'f', 'j'}, 'f', engine.Feedback{Expected: 'f', Pressed: 'x'}, false)
 	if !strings.Contains(out, "48;5;220") {
 		t.Error("expected key should stay yellow (bg 220) after the flash window")
 	}
@@ -46,9 +46,41 @@ func TestErrorHighlightOutlivesFlash(t *testing.T) {
 	}
 
 	// Flash expired after a correct press: no lingering green flash.
-	out = renderKeyboard(th, rows, 'j', engine.Feedback{Expected: 'f', Pressed: 'f', Correct: true}, false)
+	out = renderKeyboard(th, rows, []rune{'f', 'j'}, 'j', engine.Feedback{Expected: 'f', Pressed: 'f', Correct: true}, false)
 	if strings.Contains(out, "48;5;78") {
 		t.Error("correct-key flash (bg 78) should not persist past the flash window")
+	}
+}
+
+// TestKeyboardRestingBoardIsMuted verifies the three-tier scheme: unlocked keys
+// render in the muted finger palette, locked letters and modifiers in gray, and
+// no resting key uses a full-intensity finger color — full saturation is
+// reserved for the lesson text and the highlighted keys.
+func TestKeyboardRestingBoardIsMuted(t *testing.T) {
+	lipgloss.SetColorProfile(termenv.ANSI256)
+	th := DefaultTheme()
+	rows := keyboard.NewQWERTY().Rows()
+
+	out := renderKeyboard(th, rows, []rune{'f', 'j'}, 'f', engine.Feedback{}, false)
+
+	// unlocked 'j' (R-index) -> dim salmon (131), not full salmon (209)
+	if !strings.Contains(out, "38;5;131") {
+		t.Error("unlocked 'j' should use the dim R-index color (131)")
+	}
+	if strings.Contains(out, "38;5;209") {
+		t.Error("no resting key should use the full R-index color (209)")
+	}
+	// locked letters and modifiers -> gray (240)
+	if !strings.Contains(out, "38;5;240") {
+		t.Error("locked keys should use the gray locked style (240)")
+	}
+	// resting borders are uniform (238), not finger-colored
+	if !strings.Contains(out, "38;5;238") {
+		t.Error("resting caps should use the uniform dim border (238)")
+	}
+	// the current key 'f' still pops as an inverse block
+	if !strings.Contains(out, "48;5;231") {
+		t.Error("current key should keep the full-intensity inverse highlight (bg 231)")
 	}
 }
 

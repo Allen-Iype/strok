@@ -16,7 +16,8 @@ type Theme struct {
 	fingerDim [domain.FingerCount]lipgloss.Color
 	keyBorder lipgloss.Color // uniform border for non-highlighted keys
 
-	correct   lipgloss.Style // correctly typed text
+	correct   lipgloss.Style // correct results (status line, key flash)
+	typed     lipgloss.Style // already-typed correct text, dimmed so the remainder stays brightest
 	incorrect lipgloss.Style // wrongly typed text
 	pending   lipgloss.Style // not-yet-typed text
 	faint     lipgloss.Style // de-emphasized marks (space dots)
@@ -26,6 +27,7 @@ type Theme struct {
 	keyCorrect    lipgloss.Style // brief green flash
 	keyExpectErr  lipgloss.Style // expected key after a wrong press (yellow)
 	keyWrongPress lipgloss.Style // the wrongly pressed key (red)
+	keyLocked     lipgloss.Style // locked letters and unused modifiers
 
 	header    lipgloss.Style
 	stat      lipgloss.Style
@@ -48,18 +50,37 @@ func DefaultTheme() Theme {
 		domain.RPinky:  "176", // magenta
 		domain.Thumb:   "245", // gray
 	}
+	// Muted analog of each finger color: same hue family, lower intensity, so
+	// the resting keyboard stays a readable finger-map without competing with
+	// the full-saturation lesson text.
+	dim := [domain.FingerCount]lipgloss.Color{
+		domain.LPinky:  "97",  // muted purple
+		domain.LRing:   "67",  // muted blue
+		domain.LMiddle: "65",  // muted green
+		domain.LIndex:  "137", // muted orange
+		domain.RIndex:  "131", // muted salmon
+		domain.RMiddle: "71",  // muted green2
+		domain.RRing:   "31",  // muted blue2
+		domain.RPinky:  "96",  // muted magenta
+		domain.Thumb:   "240", // muted gray
+	}
 	return Theme{
-		finger: fg,
+		finger:    fg,
+		fingerDim: dim,
+		keyBorder: lipgloss.Color("238"),
 
 		correct:   lipgloss.NewStyle().Foreground(lipgloss.Color("78")),
-		incorrect: lipgloss.NewStyle().Foreground(lipgloss.Color("203")).Underline(true),
+		typed:     lipgloss.NewStyle().Foreground(lipgloss.Color("65")),
+		incorrect: lipgloss.NewStyle().Foreground(lipgloss.Color("231")).Background(lipgloss.Color("196")).Bold(true),
 		pending:   lipgloss.NewStyle().Foreground(lipgloss.Color("245")),
-		cursor:    lipgloss.NewStyle().Foreground(lipgloss.Color("231")).Underline(true).Bold(true),
+		faint:     lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
+		cursor:    lipgloss.NewStyle().Foreground(lipgloss.Color("16")).Background(lipgloss.Color("231")).Bold(true),
 
 		keyCurrent:    lipgloss.NewStyle().Foreground(lipgloss.Color("16")).Background(lipgloss.Color("231")).Bold(true),
 		keyCorrect:    lipgloss.NewStyle().Foreground(lipgloss.Color("16")).Background(lipgloss.Color("78")).Bold(true),
 		keyExpectErr:  lipgloss.NewStyle().Foreground(lipgloss.Color("16")).Background(lipgloss.Color("220")).Bold(true),
 		keyWrongPress: lipgloss.NewStyle().Foreground(lipgloss.Color("231")).Background(lipgloss.Color("196")).Bold(true),
+		keyLocked:     lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
 
 		header:    lipgloss.NewStyle().Foreground(lipgloss.Color("231")).Bold(true),
 		stat:      lipgloss.NewStyle().Foreground(lipgloss.Color("231")).Bold(true),
@@ -69,7 +90,14 @@ func DefaultTheme() Theme {
 	}
 }
 
-// fingerStyle returns the normal foreground style for a finger.
+// fingerStyle returns the full-intensity foreground style for a finger, used
+// where the finger colors carry the focus (lesson text, key highlights).
 func (t Theme) fingerStyle(f domain.Finger) lipgloss.Style {
 	return lipgloss.NewStyle().Foreground(t.finger[f])
+}
+
+// fingerDimStyle returns the muted foreground style for a finger, used for the
+// resting keyboard so it reads as a background reference.
+func (t Theme) fingerDimStyle(f domain.Finger) lipgloss.Style {
+	return lipgloss.NewStyle().Foreground(t.fingerDim[f])
 }

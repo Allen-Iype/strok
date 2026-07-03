@@ -6,10 +6,10 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// minHeight is the smallest terminal height the full layout needs. The bordered
-// keyboard occupies 15 lines plus the finger legend ~3; the rest is header,
-// stats, text, status line, footer and frame.
-const minHeight = 29
+// minHeight is the smallest terminal height the full layout needs: the framed
+// body — bordered keyboard (15 lines), one-line legend, header, stats, the
+// lesson/status block in its whitespace pocket, footer — plus the frame border.
+const minHeight = 30
 
 // View composes the full frame each render. It recomputes layout from the
 // current dimensions so terminal resizes are handled gracefully.
@@ -39,19 +39,23 @@ func (m Model) View() string {
 	}
 	text := renderText(t, m.deps.Layout, m.state.Entries(), m.state.Cursor(), textWidth)
 
-	kb := renderKeyboard(t, rows, m.state.Expected(), m.state.Feedback(), flashing)
+	kb := renderKeyboard(t, rows, m.state.Keyset(), m.state.Expected(), m.state.Feedback(), flashing)
 	legend := renderLegend(t, textWidth)
 	footer := renderFooter(t)
 	status := renderStatus(t, m.justFinished, m.outcome, m.lastResult, textWidth)
 
+	// The lesson/status block sits in a double-blank pocket of whitespace —
+	// the terminal's only "font size" — so the eye lands on it first.
 	body := lipgloss.JoinVertical(
 		lipgloss.Left,
 		header,
 		"",
 		statsBar,
 		"",
+		"",
 		text,
 		status,
+		"",
 		"",
 		kb,
 		"",

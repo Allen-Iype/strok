@@ -78,7 +78,7 @@ func TestSmokeRenderAndType(t *testing.T) {
 	if !strings.Contains(out, "WPM") {
 		t.Fatal("stats bar not rendered")
 	}
-	if !strings.Contains(out, "L-index") {
+	if !strings.Contains(out, "index") {
 		t.Fatal("finger legend not rendered")
 	}
 	if !strings.Contains(out, "●") {

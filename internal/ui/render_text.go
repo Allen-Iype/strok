@@ -9,14 +9,15 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// renderText draws the lesson text with per-character coloring. A mistyped
-// character shows the wrongly typed rune in the error style right at the
-// cursor, so a typo is visible where the eye is focused until it is corrected.
-// Correctly typed characters are green. Not-yet-typed characters — including
-// the current one — are colored by their finger so the typist can see which
-// finger to use before pressing; the current character is additionally
-// underlined and bold. Spaces show as a middle dot, or an underscore at the
-// cursor.
+// renderText draws the lesson text with per-character coloring. The line is
+// the brightest element in the frame: not-yet-typed characters carry the
+// full-saturation finger colors, already-typed characters dim to a muted
+// green, and word-separator dots are faint — so what's ahead stays brightest
+// and the bright/dim boundary tracks the typist's position. The cursor is an
+// inverse block matching the keyboard's current-key highlight, and a mistyped
+// character shows the wrongly typed rune as a red block right at the cursor
+// (matching the wrongly pressed key) until it is corrected. Spaces show as a
+// middle dot, or an underscore at the cursor.
 func renderText(t Theme, layout keyboard.Layout, entries []engine.Entry, cursor, width int) string {
 	var b strings.Builder
 	for i, e := range entries {
@@ -38,11 +39,19 @@ func renderText(t Theme, layout keyboard.Layout, entries []engine.Entry, cursor,
 			if e.Expected == ' ' {
 				disp = "_"
 			}
-			b.WriteString(fingerStyleFor(t, layout, e.Expected).Underline(true).Bold(true).Render(disp))
+			b.WriteString(t.cursor.Render(disp))
 		case e.Status == engine.Correct:
-			b.WriteString(t.correct.Render(ch))
+			if e.Expected == ' ' {
+				b.WriteString(t.faint.Render(ch))
+			} else {
+				b.WriteString(t.typed.Render(ch))
+			}
 		default:
-			b.WriteString(fingerStyleFor(t, layout, e.Expected).Render(ch))
+			if e.Expected == ' ' {
+				b.WriteString(t.faint.Render(ch))
+			} else {
+				b.WriteString(fingerStyleFor(t, layout, e.Expected).Render(ch))
+			}
 		}
 	}
 
