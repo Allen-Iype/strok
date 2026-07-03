@@ -10,10 +10,16 @@ import (
 // so that alternative themes can be added later without changing rendering.
 type Theme struct {
 	finger [domain.FingerCount]lipgloss.Color
+	// fingerDim is the muted variant of each finger color, used for the key
+	// caps so the keyboard reads as a background reference while the lesson
+	// text — in the bright palette — stays the visual focus.
+	fingerDim [domain.FingerCount]lipgloss.Color
+	keyBorder lipgloss.Color // uniform border for non-highlighted keys
 
 	correct   lipgloss.Style // correctly typed text
 	incorrect lipgloss.Style // wrongly typed text
 	pending   lipgloss.Style // not-yet-typed text
+	faint     lipgloss.Style // de-emphasized marks (space dots)
 	cursor    lipgloss.Style // current character
 
 	keyCurrent    lipgloss.Style // current expected key highlight
