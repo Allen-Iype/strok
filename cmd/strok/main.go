@@ -49,7 +49,7 @@ func run() error {
 
 	deps := ui.Deps{
 		Layout:    keyboard.NewQWERTY(),
-		Generator: lesson.NewProgressive(rand.New(rand.NewSource(time.Now().UnixNano()))),
+		Generator: lesson.NewCurriculum(rand.New(rand.NewSource(time.Now().UnixNano()))),
 		Store:     store,
 		Clock:     ui.RealClock{},
 		Theme:     ui.DefaultTheme(),

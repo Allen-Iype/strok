@@ -1,6 +1,8 @@
 # strok — Lesson Generation Evolution (design, pre-implementation)
 
-Status: **proposed — awaiting approval, no implementation yet.**
+Status: **approved. Stage 2 (pseudo-words + curriculum) implemented — see
+`internal/lesson/pseudoword.go` and `internal/lesson/curriculum.go`. Stages
+3+ (vocabulary, programming lessons) remain design-only.**
 
 Scope: evolve lesson *texture* — what the generated text looks like — from
 random character drills toward pronounceable pseudo-words, real vocabulary,
