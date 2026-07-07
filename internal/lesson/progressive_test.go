@@ -20,6 +20,28 @@ func TestUnlockedForWidens(t *testing.T) {
 	}
 }
 
+// TestUnlockOrderLettersBeforePunctuation pins the pedagogical intent of the
+// progression: every alphabetic key unlocks before any punctuation, so the
+// learner masters the full alphabet before the pinky-operated punctuation keys.
+func TestUnlockOrderLettersBeforePunctuation(t *testing.T) {
+	seenPunct := false
+	letters := map[rune]bool{}
+	for _, r := range unlockOrder {
+		isLetter := r >= 'a' && r <= 'z'
+		if isLetter {
+			if seenPunct {
+				t.Fatalf("letter %q unlocks after punctuation; letters must all come first", r)
+			}
+			letters[r] = true
+		} else {
+			seenPunct = true
+		}
+	}
+	if len(letters) != 26 {
+		t.Errorf("unlock order covers %d letters, want all 26", len(letters))
+	}
+}
+
 func TestNextUsesOnlyUnlockedLetters(t *testing.T) {
 	g := NewProgressive(rand.New(rand.NewSource(1)))
 	p := domain.NewProfile()

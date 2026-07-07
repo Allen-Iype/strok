@@ -7,25 +7,28 @@ import (
 	"strok/internal/domain"
 )
 
-// unlockOrder is the sequence in which letters are introduced. It starts on the
-// home-row index fingers (f, j) and widens outward, matching the spec's
-// progression (f, j, then more letters).
+// unlockOrder is the sequence in which keys are introduced. It starts on the
+// home-row index fingers (f, j) and widens outward row by row — but letters
+// only: all punctuation is deferred to a final phase so the learner builds
+// confidence with the full alphabet before the awkward pinky-operated
+// punctuation keys. Within that final phase, ';' comes first (home row, and
+// the most code-relevant), then the bottom-row punctuation.
 var unlockOrder = []rune{
 	'f', 'j', // home index
 	'd', 'k', // home middle
 	's', 'l', // home ring
-	'a', ';', // home pinky
-	'g', 'h', // index stretch
-	'e', 'i', // top middle
-	'r', 'u', // top index
-	'w', 'o', // top ring
-	'q', 'p', // top pinky
-	't', 'y', // top index stretch
-	'c', ',', // bottom middle
+	'a', 'g', // home pinky + index stretch
+	'h', 'e', // index stretch + top middle
+	'i', 'r', // top middle + top index
+	'u', 'w', // top index + top ring
+	'o', 'q', // top ring + top pinky
+	'p', 't', // top pinky + top index stretch
+	'y', 'c', // top index stretch + bottom middle
 	'v', 'm', // bottom index
-	'x', '.', // bottom ring
-	'z', '/', // bottom pinky
+	'x', 'z', // bottom ring + bottom pinky
 	'b', 'n', // bottom index stretch
+	';', ',', // punctuation: home pinky first…
+	'.', '/', // …then the bottom row, once the letters are solid
 }
 
 // Progressive is a drill-style generator: it emits random groupings of the
