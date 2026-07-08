@@ -76,7 +76,8 @@ func (m Model) View() string {
 
 func (m Model) tooSmallView(kbWidth int) string {
 	msg := "Terminal too small.\nResize to at least " +
-		strconv.Itoa(kbWidth+4) + "×" + strconv.Itoa(minHeight+2) + " to play."
+		strconv.Itoa(kbWidth+4) + "×" + strconv.Itoa(minHeight+2) +
+		" to play.\nnow " + strconv.Itoa(m.width) + "×" + strconv.Itoa(m.height) + "."
 	box := m.deps.Theme.box.Render(msg)
 	return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, box)
 }

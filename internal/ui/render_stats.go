@@ -11,18 +11,34 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+// headerKeyListMax is the largest keyset the header spells out in full. Past it
+// the explicit list would crowd the top bar, so the header switches to a count
+// plus the newest key — the one thing there worth reading.
+const headerKeyListMax = 8
+
 // renderHeader draws a balanced top bar spanning the full content width: the
 // title anchors the left edge, the layout and active keyset the right — the
 // two ends frame the centered play surface below instead of leaving the
 // right half of the frame empty.
 func renderHeader(t Theme, layoutName string, keyset []rune, width int) string {
 	left := t.header.Render("⌨  strok")
-	right := t.statLabel.Render(fmt.Sprintf("%s · keys: %s", layoutName, spaced(keyset)))
+	right := t.statLabel.Render(fmt.Sprintf("%s · keys: %s", layoutName, keysetSummary(keyset)))
 	gap := width - lipgloss.Width(left) - lipgloss.Width(right)
 	if gap < 1 {
 		gap = 1
 	}
 	return left + strings.Repeat(" ", gap) + right
+}
+
+// keysetSummary renders the active keyset for the header: the full spaced list
+// while it is short enough to be useful, then a compact "N keys · new: x"
+// summary that calls out the most recently unlocked key without overflowing.
+func keysetSummary(keyset []rune) string {
+	if len(keyset) <= headerKeyListMax {
+		return spaced(keyset)
+	}
+	newest := string(keyset[len(keyset)-1])
+	return fmt.Sprintf("%d keys · new: %s", len(keyset), newest)
 }
 
 // renderStats draws the live statistics bar. Every value sits in a fixed-width
