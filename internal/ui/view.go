@@ -30,18 +30,21 @@ func (m Model) View() string {
 	flashing := m.deps.Clock.Now().Before(m.flashTill)
 	snap := m.snapshot()
 
-	header := renderHeader(t, m.deps.Layout.Name(), m.state.Keyset())
-	statsBar := renderStats(t, snap)
-
 	textWidth := kbWidth
 	if m.width > 0 && m.width < textWidth {
 		textWidth = m.width
 	}
+	// Everything in the play loop shares one centered axis; the header alone
+	// spans the width as a balanced top bar.
+	center := lipgloss.NewStyle().Width(textWidth).Align(lipgloss.Center)
+
+	header := renderHeader(t, m.deps.Layout.Name(), m.state.Keyset(), textWidth)
+	statsBar := center.Render(renderStats(t, snap))
 	text := renderText(t, m.deps.Layout, m.state.Entries(), m.state.Cursor(), textWidth)
 
 	kb := renderKeyboard(t, rows, m.state.Keyset(), m.state.Expected(), m.state.Feedback(), flashing)
 	legend := renderLegend(t, textWidth)
-	footer := renderFooter(t)
+	footer := center.Render(renderFooter(t))
 	status := renderStatus(t, m.justFinished, m.outcome, m.lastResult, textWidth)
 
 	// The lesson/status block sits in a double-blank pocket of whitespace —

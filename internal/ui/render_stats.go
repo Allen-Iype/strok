@@ -11,11 +11,18 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// renderHeader draws the title and the active keyset.
-func renderHeader(t Theme, layoutName string, keyset []rune) string {
-	title := t.header.Render("⌨  strok")
-	sub := t.statLabel.Render(fmt.Sprintf("· %s · keys: %s", layoutName, spaced(keyset)))
-	return lipgloss.JoinHorizontal(lipgloss.Bottom, title, " ", sub)
+// renderHeader draws a balanced top bar spanning the full content width: the
+// title anchors the left edge, the layout and active keyset the right — the
+// two ends frame the centered play surface below instead of leaving the
+// right half of the frame empty.
+func renderHeader(t Theme, layoutName string, keyset []rune, width int) string {
+	left := t.header.Render("⌨  strok")
+	right := t.statLabel.Render(fmt.Sprintf("%s · keys: %s", layoutName, spaced(keyset)))
+	gap := width - lipgloss.Width(left) - lipgloss.Width(right)
+	if gap < 1 {
+		gap = 1
+	}
+	return left + strings.Repeat(" ", gap) + right
 }
 
 // renderStats draws the live statistics bar. Every value sits in a fixed-width
@@ -67,7 +74,7 @@ func renderStatus(t Theme, show bool, o mode.Outcome, result domain.Stats, width
 
 // renderFooter draws the key hints.
 func renderFooter(t Theme) string {
-	return t.footer.Render("esc/ctrl+c quit · backspace correct · tab restart lesson")
+	return t.footer.Render("esc quit · ⌫ fix · tab new lesson")
 }
 
 // statCell renders one label + value pair, the value left-aligned in a
