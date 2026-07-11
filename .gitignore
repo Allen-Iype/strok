@@ -2,6 +2,9 @@
 /strok
 *.exe
 
+# GoReleaser build output
+/dist/
+
 # Test artifacts
 *.out
 *.corrupt

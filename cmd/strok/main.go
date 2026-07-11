@@ -21,6 +21,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// version is the build version, injected at release time via -ldflags.
+// It stays "dev" for local `go build` / `go run`.
+var version = "dev"
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, "strok:", err)
@@ -30,7 +34,13 @@ func main() {
 
 func run() error {
 	dataPath := flag.String("data", "", "path to the profile JSON file (default: OS config dir)")
+	showVersion := flag.Bool("version", false, "print the version and exit")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println("strok", version)
+		return nil
+	}
 
 	path := *dataPath
 	if path == "" {
