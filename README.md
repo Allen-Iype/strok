@@ -6,21 +6,7 @@ A terminal-based typing app for developers.
 feedback, and grows the alphabet you practice as you improve — all in a single,
 dependency-free binary.
 
-```
-⌨  strok · QWERTY · keys: f j d k
-
-WPM 42   ACC 97%   ERR 3   CHARS 58   TIME 00:21
-
-  fjfj jfjf ffjj djkd fjf      (each letter tinted by its finger)
-
-  ┌─┬─┬─┬ … full color-coded keyboard, current key highlighted … ┐
-  └──────────────────────────────────────────────────────────────┘
-
-  ● L-pinky  ● L-ring  ● L-mid  ● L-index
-  ● R-index  ● R-mid  ● R-ring  ● R-pinky  ● thumb
-
-esc/ctrl+c quit · backspace correct · tab restart lesson
-```
+![strok in action](docs/demo.gif)
 
 ## Features
 
@@ -100,6 +86,17 @@ make build   # build the binary
 make test    # run the test suite
 make run     # build and run
 make vet     # go vet
+```
+
+### Regenerating the demo GIF
+
+The README GIF is recorded with [vhs](https://github.com/charmbracelet/vhs)
+from a checked-in tape. `cmd/demorec` is a throwaway harness that runs the real
+UI with a fixed-seed generator, so the demo lesson is deterministic and the
+recorded run is always all-green:
+
+```bash
+vhs docs/demo.tape   # rewrites docs/demo.gif
 ```
 
 ## License
