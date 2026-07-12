@@ -25,19 +25,32 @@ dependency-free binary.
   completed lessons, weak keys) is saved as JSON.
 - **Resize-safe** and works on Linux, macOS, and Windows.
 
-## Install & run
+## Install
 
-Requires Go 1.22+.
+### Download a prebuilt binary (recommended)
+
+No Go toolchain required. Grab the archive for your platform from the
+[latest release](https://github.com/Allen-Iype/strok/releases/latest) —
+prebuilt for Linux, macOS, and Windows (amd64 and arm64) — then extract and run.
+
+For example, on macOS (Apple Silicon):
 
 ```bash
-go run ./cmd/strok
+curl -sL https://github.com/Allen-Iype/strok/releases/latest/download/strok_0.1.0_darwin_arm64.tar.gz | tar xz
+./strok
 ```
 
-Or build a binary:
+Move `strok` somewhere on your `PATH` (e.g. `sudo mv strok /usr/local/bin/`) to
+run it from anywhere. On macOS you may need to clear the quarantine flag first:
+`xattr -d com.apple.quarantine strok`.
+
+### Build from source
+
+Requires Go 1.25+.
 
 ```bash
-go build -o strok ./cmd/strok
-./strok
+go run ./cmd/strok                  # run directly
+go build -o strok ./cmd/strok       # or build a binary, then ./strok
 ```
 
 ### Flags
@@ -45,6 +58,7 @@ go build -o strok ./cmd/strok
 | Flag | Description |
 |------|-------------|
 | `--data <path>` | Override the profile JSON location (default: OS config dir, e.g. `~/.config/strok/profile.json`). |
+| `--version` | Print the version and exit. |
 
 ## Controls
 
